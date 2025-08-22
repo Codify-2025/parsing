@@ -1,6 +1,9 @@
 package Codify.parsing.exception;
 
 import Codify.parsing.exception.baseException.BaseException;
+import Codify.parsing.exception.databaseException.DatabaseException;
+import Codify.parsing.exception.parsingException.SyntaxException;
+import Codify.parsing.exception.parsingException.TokenizationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -32,4 +35,24 @@ public class ApiExceptionHandler {
                 ApiErrorResponse.of(errorCode),
                 errorCode.getStatus());
     }
+
+    @ExceptionHandler(SyntaxException.class)
+    protected ResponseEntity<ApiErrorResponse> handle(SyntaxException e) {
+        log.error("SyntaxException", e);
+        return createErrorResponseEntity(e.getErrorCode());
+    }
+
+
+    @ExceptionHandler(TokenizationException.class)
+    protected ResponseEntity<ApiErrorResponse> handle(TokenizationException e) {
+        log.error("TokenizationException", e);
+        return createErrorResponseEntity(e.getErrorCode());
+    }
+
+    @ExceptionHandler(DatabaseException.class)
+    protected ResponseEntity<ApiErrorResponse> handle(DatabaseException e) {
+        log.error("Database error", e);
+        return createErrorResponseEntity(e.getErrorCode());
+    }
+
 }

@@ -1,12 +1,5 @@
 package Codify.parsing.dto;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@Getter
-@RequiredArgsConstructor
-public final class CodeDto {
-    private final String code;
-    private final Integer submissionId;
-    private final Integer studentId;
+//데이터 전달만 담당 -> record로 선언
+public record CodeDto(String code, Integer assignmentId, Integer submissionId, Integer studentId) {
 }

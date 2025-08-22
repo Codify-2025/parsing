@@ -1,6 +1,7 @@
 package Codify.parsing.service.token;
 
-import Codify.parsing.config.CppKeyWordSets;
+import Codify.parsing.config.cpp.CppKeyWordSets;
+import Codify.parsing.exception.parsingException.TokenizationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,10 @@ public class CppTokenizer {
     }
 
     public List<Token> tokenize(String code) {
+
+        if((code == null)){
+            throw new TokenizationException("코드가 비어있거나 null입니다", 1 );
+        }
 
         //토큰을 저장할 list 생성
         List<Token> tokens = new ArrayList<>();

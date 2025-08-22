@@ -1,4 +1,4 @@
-package Codify.parsing.config;
+package Codify.parsing.config.cpp;
 
 import java.util.Set;
 

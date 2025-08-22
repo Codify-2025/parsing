@@ -6,10 +6,9 @@ import Codify.parsing.service.ParsingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +20,11 @@ public class ParsingController {
     @PostMapping("/")
     public ResponseEntity<ResultDto> parsing(@RequestBody CodeDto codeDto) {
         return ResponseEntity.ok(parsingService.parsing(codeDto));
+    }
+
+    @GetMapping("/file/{fileName}")
+    public ResponseEntity<ResultDto> parseFromFile(@PathVariable String fileName) throws IOException {
+        return ResponseEntity.ok(parsingService.parseFromFile(fileName));
     }
 
 }

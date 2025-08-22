@@ -1,6 +1,6 @@
 package Codify.parsing.tokenizer;
 
-import Codify.parsing.config.CppKeyWordSets;
+import Codify.parsing.config.cpp.CppKeyWordSets;
 import Codify.parsing.service.token.CppTokenizer;
 import Codify.parsing.service.token.Token;
 import org.junit.jupiter.api.BeforeEach;

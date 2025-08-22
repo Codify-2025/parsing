@@ -10,7 +10,14 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "E3", "서버 에러가 발생했습니다."),
     NOT_FOUND(HttpStatus.NOT_FOUND, "E4", "존재하지 않는 엔티티입니다."),
 
-    ARTICLE_NOT_FOUND(HttpStatus.NOT_FOUND, "A1", "존재하지 않는 아티클입니다.");
+    ARTICLE_NOT_FOUND(HttpStatus.NOT_FOUND, "A1", "존재하지 않는 아티클입니다."),
+
+    //파싱 관련 에러
+    TOKENIZATION_ERROR(HttpStatus.BAD_REQUEST,"P1","토큰화 중 오류 발생"),
+    SYNTAX_ERROR(HttpStatus.BAD_REQUEST,"P2","구문 분석 중 오류 발생"),
+
+    //데이터베이스 에러
+    DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR,"D1","데이터베이스 저장 중 오류 발생");
 
     private final HttpStatus status; //http 상태 코드
     private final String code; //에러 구분 코드
