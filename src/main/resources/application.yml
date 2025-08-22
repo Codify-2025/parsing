@@ -9,6 +9,9 @@ spring:
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_SCHEMA}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+  data:
+    mongodb:
+      uri: mongodb+srv://${MONGO_USERNAME}:${MONGO_PASSWORD}@codify.mongocluster.cosmos.azure.com/codify?tls=true&authSource=admin&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000
 
   jpa:
     database: mysql
