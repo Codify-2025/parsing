@@ -8,9 +8,11 @@ import Codify.parsing.exception.databaseException.DatabaseException;
 import Codify.parsing.repository.ResultRepository;
 import Codify.parsing.service.parsing.ASTNode;
 import Codify.parsing.service.parsing.Parsing;
+import Codify.parsing.service.producer.ParsingCompleteProducer;
 import Codify.parsing.service.token.CppTokenizer;
 import Codify.parsing.service.token.Token;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,7 @@ public class ParsingService {
     private final CppTokenizer cppTokenizer;
     private final CppParsingTable cppParsingTable;
     private final Parsing parsing;
+    private final ParsingCompleteProducer parsingCompleteProducer;
 
     @Transactional
     public ResultDto parsing(CodeDto codeDto) {
@@ -40,6 +43,8 @@ public class ParsingService {
             Result result = new Result(assignmentId,submissionId, studentId, resultNode);
             resultRepository.save(result);
 
+            parsingCompleteProducer.sendParsingCompleteMessage(assignmentId,submissionId,studentId);
+
             return ResultDto.builder()
                     .assignmentId(assignmentId)
                     .studentId(studentId)
@@ -48,6 +53,7 @@ public class ParsingService {
         } catch (DatabaseException e) {
             throw new DatabaseException("파싱 결과 저장 중 데이터베이스 오류가 발생했습니다");
         }
+        //db에 save후 message broker에 넣기
     }
 
     @Transactional
