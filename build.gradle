@@ -39,11 +39,18 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+    //rabbitMQ
+    implementation 'org.springframework.boot:spring-boot-starter-amqp'
+
 	//swagger
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
 
 	//mongodb
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
+    // AWS S3
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
 }
 
 dependencyManagement {
