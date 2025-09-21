@@ -19,6 +19,8 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationAdapter;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -120,13 +122,23 @@ public class ParsingService {
                 message.getTotalFiles(),
                 LocalDateTime.now()
             );
-            rabbitTemplate.convertAndSend("codifyExchange", "parsing.complete", completedMessage);
-            log.info("similarity queue에 push완료");
-            log.info("submissionIds: {}", completedMessage.getSubmissionIds());
-            log.info("assignmentId: {}", completedMessage.getAssignmentId());
-            log.info("groupId: {}", completedMessage.getGroupId());
-            log.info("messageType: {}", completedMessage.getMessageType());
-            log.info("totalFiles: {}", completedMessage.getTotalFiles());
+
+            //트랜잭션 커밋 후 메시지 전송
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+                @Override
+                public void afterCommit() {
+                    rabbitTemplate.convertAndSend("codifyExchange", "parsing.complete", completedMessage);
+                    log.info("similarity queue에 push완료");
+                    log.info("submissionIds: {}", completedMessage.getSubmissionIds());
+                    log.info("assignmentId: {}", completedMessage.getAssignmentId());
+                    log.info("groupId: {}", completedMessage.getGroupId());
+                    log.info("messageType: {}", completedMessage.getMessageType());
+                    log.info("totalFiles: {}", completedMessage.getTotalFiles());
+                }
+
+            });
+
+
 
             return completedMessage;
 
