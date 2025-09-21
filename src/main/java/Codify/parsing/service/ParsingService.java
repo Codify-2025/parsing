@@ -102,6 +102,7 @@ public class ParsingService {
                 //4. 파싱 결과를 mongodb에 저장
                 Result result = new Result(codeDto.assignmentId(),codeDto.submissionId(), codeDto.studentId(), resultNode);
                 resultRepository.save(result);
+                log.info("parsing 완료 후 mongodb에 저장 : {}", codeDto.submissionId());
             }
 
             //파싱 완료 후 message를 RabbitMQ에 push
@@ -114,6 +115,12 @@ public class ParsingService {
                 LocalDateTime.now()
             );
             rabbitTemplate.convertAndSend("codifyExchange", "parsing.complete", completedMessage);
+            log.info("similarity queue에 push완료");
+            log.info("message를 RabbitMQ에 push submissionIds: {}", message.getSubmissionIds());
+            log.info("message를 RabbitMQ에 push assignmentId: {}", message.getAssignmentId());
+            log.info("message를 RabbitMQ에 push groupId: {}", message.getGroupId());
+            log.info("message를 RabbitMQ에 push messageType: {}", message.getMessageType());
+            log.info("message를 RabbitMQ에 push totalFiles: {}", message.getTotalFiles());
 
             return message;
 
