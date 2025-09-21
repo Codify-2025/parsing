@@ -76,6 +76,12 @@ public class ParsingService {
     //s3에서 파일을 가져와서 -> 파싱 완료 후 -> 메시지 브로커의 similarity.queue에 저장(parsing.complete exchange가 전달)
     @Transactional
     public MessageDto parseFromS3BySubmissionId(MessageDto message) {
+        log.info("parsing queue에서 메시지 pull");
+        log.info("submissionIds: {}", message.getSubmissionIds());
+        log.info("assignmentId: {}", message.getAssignmentId());
+        log.info("push groupId: {}", message.getGroupId());
+        log.info("push messageType: {}", message.getMessageType());
+        log.info("totalFiles: {}", message.getTotalFiles());
         try {
             // 1. 데이터베이스에서 제출 정보 조회
             List<SubmissionInfoDto> submissions = submissionRepository.findAllBySubmissionIdIn(message.getSubmissionIds());
@@ -116,13 +122,13 @@ public class ParsingService {
             );
             rabbitTemplate.convertAndSend("codifyExchange", "parsing.complete", completedMessage);
             log.info("similarity queue에 push완료");
-            log.info("message를 RabbitMQ에 push submissionIds: {}", message.getSubmissionIds());
-            log.info("message를 RabbitMQ에 push assignmentId: {}", message.getAssignmentId());
-            log.info("message를 RabbitMQ에 push groupId: {}", message.getGroupId());
-            log.info("message를 RabbitMQ에 push messageType: {}", message.getMessageType());
-            log.info("message를 RabbitMQ에 push totalFiles: {}", message.getTotalFiles());
+            log.info("submissionIds: {}", completedMessage.getSubmissionIds());
+            log.info("assignmentId: {}", completedMessage.getAssignmentId());
+            log.info("groupId: {}", completedMessage.getGroupId());
+            log.info("messageType: {}", completedMessage.getMessageType());
+            log.info("totalFiles: {}", completedMessage.getTotalFiles());
 
-            return message;
+            return completedMessage;
 
         } catch (Exception e) {
             throw new RuntimeException("S3 파일 파싱 중 오류 발생: submissionIds=" + message.getSubmissionIds(), e);

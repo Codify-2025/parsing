@@ -20,11 +20,11 @@ public class ParsingMessageListener {
     @RabbitListener(queues = "parsing.queue",containerFactory =
             "rabbitListenerContainerFactory")
     public void handleFileUpload(MessageDto message) {
-        log.info("Received file upload message: {}", message.getGroupId());
+        log.info("Received file upload message from parsing.queue: {}", message.getGroupId());
         try {
             parsingService.parseFromS3BySubmissionId(message);
         } catch (Exception e) {
-            log.error("Failed to process parsing message", e);
+            log.error("Failed to process parsing message from parsing.queue", e);
             throw new AmqpRejectAndDontRequeueException("Parsing failed", e);
         }
     }
