@@ -186,7 +186,45 @@ public class CppTokenizer {
                         tokens.add(new Token(type, value, line, startColumn));
                         continue;
                     }
+                    // 음수 처리: - 뒤에 숫자가 오고, 앞이 연산자/괄호/심볼이면 음수로 처리
+                    if (c == '-' && current + 1 < code.length() && Character.isDigit(code.charAt(current + 1))) {
+                        // 이전 토큰 확인
+                        boolean isNegativeNumber = false;
+                        if (tokens.isEmpty()) {
+                            isNegativeNumber = true; // 맨 처음
+                        } else {
+                            Token lastToken = tokens.get(tokens.size() - 1);
+                            // 이전 토큰이 연산자, 괄호, 쉼표 등이면 음수로 처리
+                            if (lastToken.type().equals("SYMBOL") &&
+                                    (lastToken.value().equals("(") || lastToken.value().equals("[") ||
+                                            lastToken.value().equals("{") || lastToken.value().equals("=") ||
+                                            lastToken.value().equals("+") || lastToken.value().equals("-") ||
+                                            lastToken.value().equals("*") || lastToken.value().equals("/") ||
+                                            lastToken.value().equals(",") || lastToken.value().equals("<") ||
+                                            lastToken.value().equals(">") || lastToken.value().equals("!") ||
+                                            lastToken.value().equals("&") || lastToken.value().equals("|") ||
+                                            lastToken.value().equals("==") || lastToken.value().equals("!=") ||
+                                            lastToken.value().equals("<=") || lastToken.value().equals(">=") ||
+                                            lastToken.value().equals("&&") || lastToken.value().equals("||"))) {
+                                isNegativeNumber = true;
+                            }
+                        }
 
+                        if (isNegativeNumber) {
+                            int startColumn = column;
+                            StringBuilder sb = new StringBuilder();
+                            sb.append('-');
+                            current++;
+                            column++;
+                            while (current < code.length() && Character.isDigit(code.charAt(current))) {
+                                sb.append(code.charAt(current));
+                                current++;
+                                column++;
+                            }
+                            tokens.add(new Token("NUMBER", sb.toString(), line, startColumn));
+                            continue;
+                        }
+                    }
                     // 기호 및 연산자 처리
                     if (current + 1 < code.length()) {
                         char next = code.charAt(current + 1);
