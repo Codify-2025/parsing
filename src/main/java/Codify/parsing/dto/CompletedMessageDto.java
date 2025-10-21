@@ -1,25 +1,20 @@
 package Codify.parsing.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-//수신한 메시지
 @Getter
 @AllArgsConstructor
-public class MessageDto {
+public class CompletedMessageDto {
     private static final long serialVersionUID = 123L;
 
     private String messageType;
     private String groupId;
     private Long assignmentId;
     private List<Long> submissionIds;
-    private List<Long> studentIds;
-    private List<String> s3Keys;
     private Integer totalFiles;
     private LocalDateTime timestamp;
 

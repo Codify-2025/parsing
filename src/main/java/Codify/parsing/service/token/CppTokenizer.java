@@ -10,13 +10,14 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class CppTokenizer {
+public class CppTokenizer implements Tokenizer {
     private final CppKeyWordSets cppKeyWordSets;
 
     private static boolean isSymbol(char c) {
         return ";(){}[]+-*/=<>,.&|!".indexOf(c) != -1;
     }
 
+    @Override
     public List<Token> tokenize(String code) {
 
         if((code == null)){

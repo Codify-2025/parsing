@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 @Component
-public class Parsing {
+public class CppParsing implements Parser{
 
     private static final Set<String>
             OPERATORS = Set.of(
@@ -685,6 +685,7 @@ public class Parsing {
         return new ParseResult(innerParent, index+1);
     }
 
+    @Override
     public ASTNode parse(List<Token> tokens, ParsingTable parsingTable) {
         // 입력 검증
         if (tokens == null) {
