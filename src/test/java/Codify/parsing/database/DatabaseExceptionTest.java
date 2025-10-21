@@ -7,7 +7,7 @@ import Codify.parsing.exception.databaseException.DatabaseException;
 import Codify.parsing.repository.ResultRepository;
 import Codify.parsing.service.ParsingService;
 import Codify.parsing.service.parsing.ASTNode;
-import Codify.parsing.service.parsing.Parsing;
+import Codify.parsing.service.parsing.CppParsing;
 import Codify.parsing.service.token.CppTokenizer;
 import Codify.parsing.service.token.Token;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,7 +17,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.DataAccessException;
 
 import java.util.List;
 
@@ -36,7 +35,7 @@ public class DatabaseExceptionTest {
     @Mock
     private CppParsingTable cppParsingTable;
     @Mock
-    private Parsing parsing;
+    private CppParsing cppParsing;
 
     @InjectMocks
     private ParsingService parsingService;
@@ -59,7 +58,7 @@ public class DatabaseExceptionTest {
         // Given
         when(cppTokenizer.tokenize(testCodeDto.code())).thenReturn(
                 mockTokens);
-        when(parsing.parse(mockTokens,
+        when(cppParsing.parse(mockTokens,
                 cppParsingTable)).thenReturn(mockASTNode);
 
         // 데이터베이스 저장 시 예외 발생 시뮬레이션
@@ -78,7 +77,7 @@ public class DatabaseExceptionTest {
 
         // 토큰화와 파싱은 정상 실행되었는지 확인
         verify(cppTokenizer).tokenize(testCodeDto.code());
-        verify(parsing).parse(mockTokens, cppParsingTable);
+        verify(cppParsing).parse(mockTokens, cppParsingTable);
         verify(resultRepository).save(any(Result.class));
 
     }

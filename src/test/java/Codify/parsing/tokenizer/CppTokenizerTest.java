@@ -1,6 +1,10 @@
 package Codify.parsing.tokenizer;
 
 import Codify.parsing.config.cpp.CppKeyWordSets;
+import Codify.parsing.config.cpp.CppParsingTable;
+import Codify.parsing.service.factory.Components;
+import Codify.parsing.service.factory.ParsingFactory;
+import Codify.parsing.service.parsing.CppParsing;
 import Codify.parsing.service.token.CppTokenizer;
 import Codify.parsing.service.token.Token;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CppTokenizerTest {
 
-    private CppTokenizer tokenizer;
+    private ParsingFactory parsingFactory;
 
     @BeforeEach
         //필요한 의존성 주입
@@ -46,8 +50,12 @@ public class CppTokenizerTest {
         );
 
         CppKeyWordSets cppKeyWordSets = new CppKeyWordSets(TYPE, CONTROL, IO, ACCESS, CXX, EXCEPTION, OTHERS, HEADER);
+        CppTokenizer cppTokenizer = new CppTokenizer(cppKeyWordSets);
+        CppParsing cppParsing = new CppParsing();
+        CppParsingTable cppParsingTable = new CppParsingTable();
 
-        this.tokenizer = new CppTokenizer(cppKeyWordSets);
+        // ParsingFactory 수동으로 초기화
+        parsingFactory = new ParsingFactory(cppTokenizer, cppParsing, cppParsingTable);
     }
 
     @Test
@@ -85,8 +93,10 @@ public class CppTokenizerTest {
                 new Token("SYMBOL","}",4,0)
         );
 
+        Components components = parsingFactory.createComponent("cpp");
+
         //when
-        List<Token> actualTokens = tokenizer.tokenize(code);
+        List<Token> actualTokens = components.tokenizer().tokenize(code);
 
         //Then
         assertThat(actualTokens).isEqualTo(expectedTokens);

@@ -6,7 +6,7 @@ import Codify.parsing.dto.CodeDto;
 import Codify.parsing.dto.ResultDto;
 import Codify.parsing.repository.ResultRepository;
 import Codify.parsing.service.parsing.ASTNode;
-import Codify.parsing.service.parsing.Parsing;
+import Codify.parsing.service.parsing.CppParsing;
 import Codify.parsing.service.token.CppTokenizer;
 import Codify.parsing.service.token.Token;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 
 // ParsingService 단위 테스트 - 서비스 로직 흐름에 집중
 @ExtendWith(MockitoExtension.class)
-class ParsingServiceTest {
+class CppParsingServiceTest {
 
     @Mock
     private ResultRepository resultRepository;
@@ -39,7 +39,7 @@ class ParsingServiceTest {
     private CppParsingTable cppParsingTable;
     
     @Mock
-    private Parsing parsing;
+    private CppParsing cppParsing;
 
     // parsingService에 Mock 객체들 주입
     @InjectMocks
@@ -65,15 +65,15 @@ class ParsingServiceTest {
 
         // Given - 가짜 객체들이 어떤 값을 반환할지 설정
         when(cppTokenizer.tokenize(testCodeDto.code())).thenReturn(mockTokens);
-        when(parsing.parse(mockTokens, cppParsingTable)).thenReturn(mockASTNode);
+        when(cppParsing.parse(mockTokens, cppParsingTable)).thenReturn(mockASTNode);
         
         // When - service method호출
         parsingService.parsing(testCodeDto);
         
         // Then - 올바른 순서로 호출되었는지 확인
-        InOrder inOrder = inOrder(cppTokenizer, parsing, resultRepository);
+        InOrder inOrder = inOrder(cppTokenizer, cppParsing, resultRepository);
         inOrder.verify(cppTokenizer).tokenize(testCodeDto.code());
-        inOrder.verify(parsing).parse(eq(mockTokens), eq(cppParsingTable));
+        inOrder.verify(cppParsing).parse(eq(mockTokens), eq(cppParsingTable));
         inOrder.verify(resultRepository).save(any(Result.class));
     }
 
@@ -82,7 +82,7 @@ class ParsingServiceTest {
     void parsing_ShouldReturnCorrectResultDto() {
         // Given
         when(cppTokenizer.tokenize(any())).thenReturn(mockTokens);
-        when(parsing.parse(any(), any())).thenReturn(mockASTNode);
+        when(cppParsing.parse(any(), any())).thenReturn(mockASTNode);
         
         // When
         ResultDto result = parsingService.parsing(testCodeDto);
@@ -99,7 +99,7 @@ class ParsingServiceTest {
     void parsing_ShouldSaveResultWithCorrectData() {
         // Given
         when(cppTokenizer.tokenize(any())).thenReturn(mockTokens);
-        when(parsing.parse(any(), any())).thenReturn(mockASTNode);
+        when(cppParsing.parse(any(), any())).thenReturn(mockASTNode);
         
         // When
         parsingService.parsing(testCodeDto);

@@ -1,23 +1,22 @@
 package Codify.parsing.service;
 
-import Codify.parsing.config.cpp.CppParsingTable;
+import Codify.parsing.config.cpp.ParsingTable;
 import Codify.parsing.domain.Result;
 import Codify.parsing.dto.*;
 import Codify.parsing.exception.databaseException.DatabaseException;
 import Codify.parsing.repository.ResultRepository;
+import Codify.parsing.service.factory.Components;
+import Codify.parsing.service.factory.ParsingFactory;
 import Codify.parsing.service.parsing.ASTNode;
-import Codify.parsing.service.parsing.Parsing;
-import Codify.parsing.service.token.CppTokenizer;
+import Codify.parsing.service.parsing.Parser;
 import Codify.parsing.service.token.Token;
+import Codify.parsing.service.token.Tokenizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,22 +25,22 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ParsingService {
     private final ResultRepository resultRepository;
-    private final CppTokenizer cppTokenizer;
-    private final CppParsingTable cppParsingTable;
-    private final Parsing parsing;
     private final S3Service s3Service;
     private final RabbitTemplate rabbitTemplate;
-
+    private final ParsingFactory factory;
 
     @Transactional
     public ResultDto parsing(CodeDto codeDto) {
+
+        Components components = factory.createComponent("cpp");
+
         try {
             int assignmentId = codeDto.assignmentId();
             int studentId = codeDto.studentId();
             int submissionId = codeDto.submissionId();
 
-            List<Token> tokens = cppTokenizer.tokenize(codeDto.code());
-            ASTNode resultNode = parsing.parse(tokens, cppParsingTable);
+            List<Token> tokens = components.tokenizer().tokenize(codeDto.code());
+            ASTNode resultNode = components.parser().parse(tokens, components.parsingTable());
 
             Result result = new Result(assignmentId,submissionId, studentId, resultNode);
             resultRepository.save(result);
@@ -61,6 +60,9 @@ public class ParsingService {
     //s3에서 파일을 가져와서 -> 파싱 완료 후 -> 메시지 브로커의 similarity.queue에 저장(parsing.complete exchange가 전달)
     @Transactional
     public MessageDto parseFromS3BySubmissionId(MessageDto message) {
+
+        Components components = factory.createComponent("cpp");
+
         //message에 s3key도 저장하도록 변경
         log.info("parsing queue에서 메시지 pull");
         log.info("submissionIds: {}", message.getSubmissionIds());
@@ -87,8 +89,8 @@ public class ParsingService {
                         submissionId.intValue(),
                         studentId.intValue());
 
-                List<Token> tokens = cppTokenizer.tokenize(codeDto.code());
-                ASTNode resultNode = parsing.parse(tokens, cppParsingTable);
+                List<Token> tokens = components.tokenizer().tokenize(codeDto.code());
+                ASTNode resultNode = components.parser().parse(tokens, components.parsingTable());
 
                 //3. 파싱 결과를 mongodb에 저장
                 Result result = new Result(codeDto.assignmentId(),codeDto.submissionId(), codeDto.studentId(), resultNode);

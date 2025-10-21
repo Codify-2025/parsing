@@ -2,7 +2,7 @@ package Codify.parsing.parse;
 
 import Codify.parsing.config.cpp.CppParsingTable;
 import Codify.parsing.exception.parsingException.SyntaxException;
-import Codify.parsing.service.parsing.Parsing;
+import Codify.parsing.service.parsing.CppParsing;
 import Codify.parsing.service.token.Token;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,7 +26,7 @@ public class ParserTest {
     private CppParsingTable cppParsingTable;
 
     @InjectMocks  // 실제 Parsing 객체 생성
-    private Parsing parsing;
+    private CppParsing cppParsing;
 
     private List<Token> validTokens;
 
@@ -48,7 +48,7 @@ public class ParserTest {
         // When & Then
         SyntaxException exception = assertThrows(
                 SyntaxException.class,
-                () -> parsing.parse(validTokens, cppParsingTable)
+                () -> cppParsing.parse(validTokens, cppParsingTable)
         );
 
         assertThat(exception.getMessage()).contains("예상치 못한 토큰");

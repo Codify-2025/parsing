@@ -2,6 +2,8 @@ package Codify.parsing.tokenizer;
 
 import Codify.parsing.config.cpp.CppKeyWordSets;
 import Codify.parsing.exception.parsingException.TokenizationException;
+import Codify.parsing.service.factory.Components;
+import Codify.parsing.service.factory.ParsingFactory;
 import Codify.parsing.service.token.CppTokenizer;
 import Codify.parsing.service.token.Token;
 import org.junit.jupiter.api.DisplayName;
@@ -23,18 +25,19 @@ public class CppTokenizerExceptionTest {
     @Mock
     private CppKeyWordSets cppKeyWordSets;
     @InjectMocks
-    private CppTokenizer cppTokenizer;
+    private ParsingFactory parsingFactory;
 
     @Test
     @DisplayName("null code 입력 시 TokenizerException 발생")
     void tokenize_NullCode_ShouldThrowTokenizationException() {
         // Given
         String nullCode = null;
+        Components components = parsingFactory.createComponent("cpp");
 
         // When & Then
         TokenizationException exception = assertThrows(
                 TokenizationException.class,
-                () -> cppTokenizer.tokenize(nullCode)
+                () -> components.tokenizer().tokenize(nullCode)
         );
 
         // 예외 메시지 검증
